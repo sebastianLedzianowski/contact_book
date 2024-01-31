@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "contact-book"
+version = "0.1.0"
+description = ""
+authors = ["sebastianLedzianowski <136706736+sebastianLedzianowski@users.noreply.github.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.109.0"
+uvicorn = "^0.27.0.post1"
+sqlalchemy = "^2.0.25"
+psycopg2-binary = "^2.9.9"
+alembic = "^1.13.1"
+django-environ = "^0.11.2"
+pydantic-extra-types = "^2.5.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
