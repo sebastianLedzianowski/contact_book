@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -12,3 +12,4 @@ class Contact(Base):
     email = Column(String(50))
     phone_number = Column(String(15))
     birthday = Column(String(20))
+    done = Column(Boolean, default=False)

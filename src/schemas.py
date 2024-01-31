@@ -7,6 +7,14 @@ class ContactBase(BaseModel):
     birthday: str = Field(max_length=20, example="YYYY-MM-DD")
 
 
+class ContactUpdate(ContactBase):
+    done: bool
+
+
+class ContactStatusUpdate(BaseModel):
+    done: bool
+
+
 class ContactResponse(ContactBase):
     id: int
     email: EmailStr | None = Field(default=None)
