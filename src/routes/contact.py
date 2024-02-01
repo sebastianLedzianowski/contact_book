@@ -1,4 +1,3 @@
-import asyncio
 from typing import List, Any
 
 from fastapi import APIRouter, HTTPException, Depends, status
@@ -45,6 +44,10 @@ async def remove_contact(contact_id: int, db: Session = Depends(get_db)) -> Any:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
     return contact
 
+@router.post("/faker_created_contacts/{contact_id}", response_model=ContactResponse)
+async def faker_created_contact(contact_id: int, db: Session = Depends(get_db)) -> Any:
+    return await repository_contact.faker_created_contact(contact_id=contact_id, db=db)
+
 
 @router.get("/upcoming_birthdays/{days_in_future}", response_model=ContactResponse)
 async def upcoming_birthdays(days_in_future: int, db: Session = Depends(get_db)) -> Any:
@@ -54,6 +57,9 @@ async def upcoming_birthdays(days_in_future: int, db: Session = Depends(get_db))
     return contact
 
 
-@router.get("/faker_created_contacts/{contact_id}", response_model=ContactResponse)
-async def faker_created_contact(contact_id: int, db: Session = Depends(get_db)) -> Any:
-    return await repository_contact.faker_created_contact(contact_id=contact_id, db=db)
+@router.get("/searchable_by/{choice}", response_model=ContactResponse)
+async def searchable_by(choice: str, db: Session = Depends(get_db)) -> Any:
+    contact = await repository_contact.searchable_by(choice, db)
+    if contact is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
+    return contact

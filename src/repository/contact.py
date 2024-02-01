@@ -55,6 +55,21 @@ async def update_contact(contact_id: int, body: ContactUpdate, db: Session) -> C
     return contact
 
 
+async def faker_created_contact(contact_id: int, db: Session) -> Contact:
+    contact = Contact(
+        id=contact_id,
+        name=fake.first_name(),
+        lastname=fake.last_name(),
+        phone_number=fake.phone_number(),
+        email=fake.email(),
+        birthday=fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
+    )
+    db.add(contact)
+    db.commit()
+    db.refresh(contact)
+    return contact
+
+
 async def upcoming_birthdays(days_in_future: int, db: Session) -> List[Dict[str, Any]] | None:
     contacts = db.query(Contact).all()
     today = date.today()
@@ -76,22 +91,22 @@ async def upcoming_birthdays(days_in_future: int, db: Session) -> List[Dict[str,
         if today < upcoming_birthday <= today_to_birthday:
             coming_birthdays.append({"name": contact.name,
                                      "lastname": contact.lastname,
+                                     "email": contact.email,
                                      "phone_number": contact.phone_number,
                                      "days_to_birthday": days_to_birthdays
                                      })
     return coming_birthdays
 
 
-async def faker_created_contact(contact_id: int, db: Session) -> Contact:
-    contact = Contact(
-        id=contact_id,
-        name=fake.first_name(),
-        lastname=fake.last_name(),
-        phone_number=fake.phone_number(),
-        email=fake.email(),
-        birthday=fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
-    )
-    db.add(contact)
-    db.commit()
-    db.refresh(contact)
-    return contact
+async def searchable_by(choice: str, db: Session) -> List[Dict[str, Any]] | None:
+    contacts = db.query(Contact).all()
+    list_contacts = []
+
+    for contact in contacts:
+        if choice == contact.name or choice == contact.lastname or choice == contact.email:
+            list_contacts.append({"name": contact.name,
+                                  "lastname": contact.lastname,
+                                  "email": contact.email,
+                                  "phone_number": contact.phone_number
+                                  })
+    return list_contacts
