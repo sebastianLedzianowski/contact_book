@@ -43,3 +43,16 @@ async def remove_contact(contact_id: int, db: Session = Depends(get_db)) -> Any:
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
     return contact
+
+
+@router.get("/upcoming_birthdays", response_model=ContactResponse)
+async def upcoming_birthdays(days_in_future: int = 7, db: Session = Depends(get_db)) -> Any:
+    contact = await repository_contact.upcoming_birthdays(days_in_future, db)
+    if contact is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
+    return contact
+
+
+@router.get("/faker_created_contacts", response_model=ContactResponse)
+async def faker_created_contact(contact_id: int, db: Session = Depends(get_db)) -> Any:
+    return await repository_contact.faker_created_contact(contact_id=contact_id, db=db)

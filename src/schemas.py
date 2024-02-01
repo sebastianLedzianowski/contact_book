@@ -16,7 +16,7 @@ class ContactResponse(ContactBase):
     phone_number: str = Field(max_length=20, example="+48-876-654-765")
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class ContactUpdate(ContactResponse):
     pass
