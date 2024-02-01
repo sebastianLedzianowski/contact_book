@@ -8,10 +8,10 @@ class ContactBase(BaseModel):
 
 
 class ContactResponse(ContactBase):
+    id: int
     name: str = Field(max_length=50)
     lastname: str = Field(max_length=50)
-    birthday: Optional[date]
-    id: int
+    birthday: date
     email: EmailStr | None = Field(default=None)
     phone_number: str = Field(max_length=20, example="+48-876-654-765")
 
