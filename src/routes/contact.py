@@ -49,7 +49,7 @@ async def faker_created_contact(contact_id: int, db: Session = Depends(get_db)) 
     return await repository_contact.faker_created_contact(contact_id=contact_id, db=db)
 
 
-@router.get("/upcoming_birthdays/{days_in_future}", response_model=ContactResponse)
+@router.get("/upcoming_birthdays/{days_in_future}", response_model=List[ContactResponse])
 async def upcoming_birthdays(days_in_future: int, db: Session = Depends(get_db)) -> Any:
     contact = await repository_contact.upcoming_birthdays(days_in_future, db)
     if contact is None:
@@ -57,7 +57,7 @@ async def upcoming_birthdays(days_in_future: int, db: Session = Depends(get_db))
     return contact
 
 
-@router.get("/searchable_by/{choice}", response_model=ContactResponse)
+@router.get("/searchable_by/{choice}", response_model=List[ContactResponse])
 async def searchable_by(choice: str, db: Session = Depends(get_db)) -> Any:
     contact = await repository_contact.searchable_by(choice, db)
     if contact is None:

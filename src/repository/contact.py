@@ -1,5 +1,5 @@
-from datetime import datetime, timedelta, date
-from typing import List, Dict, Any
+from datetime import datetime, date
+from typing import List
 from sqlalchemy.orm import Session
 
 from src.database.models import Contact
@@ -70,43 +70,40 @@ async def faker_created_contact(contact_id: int, db: Session) -> Contact:
     return contact
 
 
-async def upcoming_birthdays(days_in_future: int, db: Session) -> List[Dict[str, Any]] | None:
-    contacts = db.query(Contact).all()
+async def upcoming_birthdays(days_in_future: int, db: Session) -> List[Contact] | None:
     today = date.today()
-    today_to_birthday = today + timedelta(days=days_in_future)
-    coming_birthdays = []
+    upcoming_birthdays_list = []
+    contacts = db.query(Contact).all()
 
     for contact in contacts:
         birthday = datetime.strptime(contact.birthday, "%Y-%m-%d")
         upcoming_birthday = date(today.year, birthday.month, birthday.day)
         days_to_birthdays = (upcoming_birthday - today).days
+        if 0 <= days_to_birthdays <= days_in_future:
+            upcoming_birthdays_list.append(Contact(
+                id=contact.id,
+                name=contact.name,
+                lastname=contact.lastname,
+                email=contact.email,
+                phone_number=contact.phone_number,
+                birthday=contact.birthday
+            ))
 
-        if today.day == birthday.day and today.month == birthday.month:
-            coming_birthdays.append({"name": contact.name,
-                                     "lastname": contact.lastname,
-                                     "phone_number": contact.phone_number,
-                                     "days_to_birthday": days_to_birthdays
-                                     })
-
-        if today < upcoming_birthday <= today_to_birthday:
-            coming_birthdays.append({"name": contact.name,
-                                     "lastname": contact.lastname,
-                                     "email": contact.email,
-                                     "phone_number": contact.phone_number,
-                                     "days_to_birthday": days_to_birthdays
-                                     })
-    return coming_birthdays
+    return upcoming_birthdays_list
 
 
-async def searchable_by(choice: str, db: Session) -> List[Dict[str, Any]] | None:
+async def searchable_by(choice: str, db: Session) -> List[Contact] | None:
     contacts = db.query(Contact).all()
     list_contacts = []
 
     for contact in contacts:
         if choice == contact.name or choice == contact.lastname or choice == contact.email:
-            list_contacts.append({"name": contact.name,
-                                  "lastname": contact.lastname,
-                                  "email": contact.email,
-                                  "phone_number": contact.phone_number
-                                  })
+            list_contacts.append(Contact(
+                id=contact.id,
+                name=contact.name,
+                lastname=contact.lastname,
+                email=contact.email,
+                phone_number=contact.phone_number,
+                birthday=contact.birthday
+            ))
     return list_contacts
