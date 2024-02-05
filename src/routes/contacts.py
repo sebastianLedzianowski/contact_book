@@ -5,16 +5,22 @@ from sqlalchemy.orm import Session
 
 from src.database.db import get_db
 from src.database.models import User
-from src.schemas import ContactResponse, ContactUpdate
+from src.schemas import ContactResponse
 from src.repository import contact as repository_contact
 from src.service.auth import auth_service
 
-router = APIRouter(prefix='/contact', tags=["contact"])
+router = APIRouter(prefix='/contacts', tags=["contacts"])
 
 
 @router.get("/", response_model=List[ContactResponse])
 async def read_contacts(skip: int = 0, limit: int = 20, db: Session = Depends(get_db),
                         current_user: User = Depends(auth_service.get_current_user)) -> Any:
+    if skip < 0:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="A negative number is used.")
+    elif limit <= skip:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                            detail="The limit is less than or equal to the skip.")
     contact = await repository_contact.get_contacts(skip, limit, current_user, db)
     return contact
 
@@ -29,15 +35,15 @@ async def read_contact(contact_id: int, db: Session = Depends(get_db),
 
 
 @router.post("/", response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
-async def created_contact(body: ContactResponse, db: Session = Depends(get_db),
-                          current_user: User = Depends(auth_service.get_current_user)) -> Any:
-    return await repository_contact.created_contact(body, current_user, db)
+async def create_contact(body: ContactResponse, db: Session = Depends(get_db),
+                         current_user: User = Depends(auth_service.get_current_user)) -> Any:
+    return await repository_contact.create_contact(body, current_user, db)
 
 
 @router.put("/{contact_id}", response_model=ContactResponse)
-async def update_contact(body: ContactUpdate, contact_id: int, db: Session = Depends(get_db),
+async def update_contact(contact_id: int, body: ContactResponse, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)) -> Any:
-    contact = await repository_contact.update_contact(contact_id, body, current_user, db)
+    contact = await repository_contact.update_contact(contact_id, current_user, body, db)
     if contact is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
     return contact
@@ -52,10 +58,11 @@ async def remove_contact(contact_id: int, db: Session = Depends(get_db),
     return contact
 
 
-@router.post("/faker_created_contacts/{contact_id}", response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
-async def faker_created_contact(contact_id: int, db: Session = Depends(get_db),
-                                current_user: User = Depends(auth_service.get_current_user)) -> Any:
-    return await repository_contact.faker_created_contact(contact_id, current_user, db)
+@router.post("/faker_created_contacts/{contact_id}",
+             response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
+async def faker_create_contact(contact_id: int, db: Session = Depends(get_db),
+                               current_user: User = Depends(auth_service.get_current_user)) -> Any:
+    return await repository_contact.faker_create_contact(contact_id, current_user, db)
 
 
 @router.get("/upcoming_birthdays/{days_in_future}", response_model=List[ContactResponse])

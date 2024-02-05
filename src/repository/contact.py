@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_
 
 from src.database.models import Contact, User
-from src.schemas import ContactResponse, ContactUpdate
+from src.schemas import ContactResponse
 
 from faker import Faker
 
@@ -21,7 +21,7 @@ async def get_contact(contact_id: int, user: User, db: Session) -> Contact:
     return db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
 
 
-async def created_contact(body: ContactResponse, user: User, db: Session) -> Contact:
+async def create_contact(body: ContactResponse, user: User, db: Session) -> Contact:
     contact = Contact(
         id=body.id,
         user_id=user.id,
@@ -45,19 +45,22 @@ async def remove_contact(contact_id: int, user: User, db: Session) -> Contact | 
     return contact
 
 
-async def update_contact(contact_id: int, user: User, body: ContactUpdate, db: Session) -> Contact | None:
+async def update_contact(contact_id: int, user: User, body: ContactResponse, db: Session) -> Contact | None:
+    print(f"Updating contact with ID: {contact_id} for user: {user.id}")
     contact = db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
+    print(f"Found contact: {contact}")
     if contact:
+        contact.id = body.id
         contact.name = body.name
         contact.lastname = body.lastname
+        contact.birthday = body.birthday
         contact.email = body.email
         contact.phone_number = body.phone_number
-        contact.birthday = body.birthday
         db.commit()
     return contact
 
 
-async def faker_created_contact(contact_id: int, user: User, db: Session) -> Contact:
+async def faker_create_contact(contact_id: int, user: User, db: Session) -> Contact:
     contact = Contact(
         id=contact_id,
         user_id=user.id,
@@ -76,6 +79,7 @@ async def faker_created_contact(contact_id: int, user: User, db: Session) -> Con
 async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> List[Contact] | None:
     today = date.today()
     upcoming_birthdays_list = []
+    # noinspection PyTypeChecker
     contacts = db.query(Contact).filter(Contact.user_id == user.id).all()
 
     for contact in contacts:
@@ -97,11 +101,12 @@ async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> Li
 
 
 async def searchable_by(choice: str, user: User, db: Session) -> List[Contact] | None:
+    # noinspection PyTypeChecker
     contacts = db.query(Contact).filter(Contact.user_id == user.id).all()
     list_contacts = []
 
     for contact in contacts:
-        if choice == contact.name or choice == contact.lastname or choice == contact.email:
+        if choice in [contact.name, contact.lastname, contact.email]:
             list_contacts.append(Contact(
                 id=contact.id,
                 user_id=user.id,

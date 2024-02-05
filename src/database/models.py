@@ -16,7 +16,7 @@ class Contact(Base):
     phone_number = Column(String(30))
     birthday = Column(String(20))
     user_id = Column('user_id', ForeignKey('users.id', ondelete='CASCADE'), default=None)
-    user = relationship('User', backref="notes")
+    user = relationship('User', backref="contact")
 
 class User(Base):
     __tablename__ = "users"
