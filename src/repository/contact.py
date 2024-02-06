@@ -12,12 +12,10 @@ fake = Faker("pl_PL")
 
 
 async def get_contacts(skip: int, limit: int, user: User, db: Session) -> List[Contact]:
-    # noinspection PyTypeChecker
     return db.query(Contact).filter(Contact.user_id == user.id).offset(skip).limit(limit).all()
 
 
 async def get_contact(contact_id: int, user: User, db: Session) -> Contact:
-    # noinspection PyTypeChecker
     return db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
 
 
@@ -79,7 +77,6 @@ async def faker_create_contact(contact_id: int, user: User, db: Session) -> Cont
 async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> List[Contact] | None:
     today = date.today()
     upcoming_birthdays_list = []
-    # noinspection PyTypeChecker
     contacts = db.query(Contact).filter(Contact.user_id == user.id).all()
 
     for contact in contacts:
@@ -101,7 +98,6 @@ async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> Li
 
 
 async def searchable_by(choice: str, user: User, db: Session) -> List[Contact] | None:
-    # noinspection PyTypeChecker
     contacts = db.query(Contact).filter(Contact.user_id == user.id).all()
     list_contacts = []
 
