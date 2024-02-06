@@ -1,3 +1,5 @@
+from typing import Type
+
 from fastapi import APIRouter, HTTPException, Depends, status, Security
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
@@ -30,9 +32,9 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid password")
 
     access_token = await auth_service.create_access_token(data={"sub": user.email})
-    refresh_token = await auth_service.create_refresh_token(data={"sub": user.email})
-    await repository_users.update_token(user, refresh_token, db)
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    refresh_token_ = await auth_service.create_refresh_token(data={"sub": user.email})
+    await repository_users.update_token(Type[user], refresh_token_, db)
+    return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
 
 
 @router.get('/refresh_token', response_model=TokenModel)
@@ -41,10 +43,10 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
     if user.refresh_token != token:
-        await repository_users.update_token(user, None, db)
+        await repository_users.update_token(Type[user], None, db)
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid refresh token")
 
     access_token = await auth_service.create_access_token(data={"sub": email})
-    refresh_token = await auth_service.create_refresh_token(data={"sub": email})
-    await repository_users.update_token(user, refresh_token, db)
-    return {"access_token": access_token, "refresh_token": refresh_token, "token_type": "bearer"}
+    refresh_token_ = await auth_service.create_refresh_token(data={"sub": email})
+    await repository_users.update_token(Type[user], refresh_token_, db)
+    return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
