@@ -4,7 +4,7 @@ A simple app to manage your contacts and track upcoming birthdays.
 
 ## Introduction
 
-Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic, and other Python technologies. It allows you to add, edit, delete contacts, and keep track of upcoming birthdays. All of this is supported by an authorization/login token.
+Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic, and other Python technologies. It allows you to add, edit, delete contacts, and keep track of upcoming birthdays. All of this is supported to JWT token pairs: access token and refresh token.
 
 ## Functions
 
@@ -18,9 +18,9 @@ Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic, and 
 ## Requirements
 
 - 🐍 Python 3.7+
-- ⚡ FastAPI
+- ⚡ FastAPI(REST API)
 - 🐘 SQLAlchemy
-- 🐘 PostgreSQL
+- 🐘 PostgresSQL
 
 ## Installation ⬇️
 
@@ -55,7 +55,7 @@ Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic, and 
 To run this project, you will need to add the following environment variables to your `.env` file.
 
 ```bash
-# PostgreSQL Database
+# PostgresSQL Database
 SQLALCHEMY_DATABASE_URL=
 # Authentication and token generation
 SECRET_KEY=
@@ -70,7 +70,7 @@ ALGORITHM=
 
 ## Installation ⬇️
 
-1.Let's run a Docker container to create a PostgreSQL server using the following command:
+1.Let's run a Docker container to create a PostgresSQL server using the following command:
 
 ```bash
 docker run --name db-postgres -p 5432:5432 -e POSTGRES_PASSWORD=567234 -d postgres
