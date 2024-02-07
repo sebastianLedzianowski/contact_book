@@ -4,10 +4,10 @@ A simple app to manage your contacts and track upcoming birthdays.
 
 ## Introduction
 
-Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic, and other Python technologies. It allows you to add, edit, delete contacts, and keep track of upcoming birthdays. All of this is supported to JWT token pairs: access token and refresh token.
-
+Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic and other Python technologies. It allows you to add, edit, delete contacts and track upcoming birthdays. When registering, you must confirm your email address by clicking on the link sent to the provided email address. Login is handled by JWT pairs: an access token and a refresh token.
 ## Functions
 
+- ✉️  Verification of the e-mail address by sending a verification message with a special link.
 - ➕ Add, ✏️ edit, and ❌ delete contacts.
 - 📅 Track upcoming birthdays.
 - 🧪 Generate fake contacts for testing purposes.
@@ -55,11 +55,21 @@ Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic, and 
 To run this project, you will need to add the following environment variables to your `.env` file.
 
 ```bash
-# PostgresSQL Database
+#PostgreSQL DateBase
 SQLALCHEMY_DATABASE_URL=
-# Authentication and token generation
+#Authentication and token generation
 SECRET_KEY=
 ALGORITHM=
+#Email config
+MAIL_USERNAME=
+MAIL_PASSWORD=
+MAIL_PORT=
+MAIL_SERVER=
+MAIL_FROM_NAME=
+MAIL_STARTTLS=
+MAIL_SSL_TLS=
+USE_CREDENTIALS=
+VALIDATE_CERTS=
 ```
 
 ---
@@ -96,10 +106,14 @@ uvicorn main:app --host localhost --port 8000 --reload
 ### 1. Registration and Login
 
 ### Registration:
-1. Go to the API in your browser: http://127.0.0.1:8000/docs.
-2. Navigate to the `/signup` tab.
+1. Go to the API in your browser: http://127.0.0.1:8000/docs. 
+2. Navigate to the /signup tab.
 3. Use the "Try it out" button and provide user details (e.g., username, password) for registration.
-4. Click "Execute" and check the response.
+4. Click "Execute" to send the registration request.
+5. Check your email inbox for a verification message.
+6. Open the verification email and click on the provided activation link.
+7. Once the activation link is clicked, return to the API or refresh the browser.
+8. You should now be successfully registered and activated. Check the response for confirmation.
 
 ### Login:
 1. Go to the API in your browser: http://127.0.0.1:8000/docs.
