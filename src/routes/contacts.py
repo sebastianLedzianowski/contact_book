@@ -7,7 +7,7 @@ from src.database.db import get_db
 from src.database.models import User
 from src.schemas import ContactResponse
 from src.repository import contact as repository_contact
-from src.service.auth import auth_service
+from src.services.auth import auth_service
 
 router = APIRouter(prefix='/contacts', tags=["contacts"])
 
