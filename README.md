@@ -1,26 +1,29 @@
 # 📚 Contact Book
 
-A simple app to manage your contacts and track upcoming birthdays.
+Contact Book is an application built with FastAPI, SQLAlchemy, Pydantic, and other Python technologies. It provides a user-friendly interface to manage contacts efficiently. Key features include the ability to add, edit, and delete contacts, as well as track upcoming birthdays.
 
-## Introduction
+## Registration and Authentication
 
-Contact Book is an application created using FastAPI, SQLAlchemy, Pydantic and other Python technologies. It allows you to add, edit, delete contacts and track upcoming birthdays. When registering, you must confirm your email address by clicking on the link sent to the provided email address. Login is handled by JWT pairs: an access token and a refresh token.
+During the registration process, users are required to confirm their email address by clicking on the activation link sent to the provided email. The login mechanism is secured using JWT pairs, comprising an access token and a refresh token. This ensures a secure and authenticated experience for users.
+
 ## Functions
 
-- ✉️  Verification of the e-mail address by sending a verification message with a special link.
-- ➕ Add, ✏️ edit, and ❌ delete contacts.
-- 📅 Track upcoming birthdays.
-- 🧪 Generate fake contacts for testing purposes.
-- 🔐 Implementation of an authentication mechanism.
-- 🔑 Implementation of an authorization mechanism using JWT tokens, so that all operations on contacts are performed only by registered users.
-- 🧑‍💻 The user only has access to their contacts operations.
+- ⏳ **User Caching:** Mechanism allowing user caching in the application to optimize data access and improve performance.
+- 🔒 **Implementation of Authentication Mechanism:** Securing the application by introducing a user authentication mechanism.
+- 🗝️ **Implementation of Authorization Mechanism using JWT Tokens:** Ensuring that all operations on contacts are performed only by registered users.
+- 📅 **Tracking Upcoming Birthdays:** Feature for monitoring upcoming birthdays among contacts.
+- ➕ **Adding Contacts:** Ability to add new contacts to the application.
+- ✏️ **Editing Contacts:** Feature allowing the editing of existing contact details.
+- ❌ **Deleting Contacts:** Ability to remove unnecessary contacts from the list.
+- 🧪 **Generating Fake Contacts for Testing Purposes:** Allows adding artificial contact data for testing purposes.
 
 ## Requirements
 
-- 🐍 Python 3.7+
+- 🐍 Python 3.10+
 - ⚡ FastAPI(REST API)
 - 🐘 SQLAlchemy
 - 🐘 PostgresSQL
+- 📘 Pydantic
 
 ## Installation ⬇️
 
