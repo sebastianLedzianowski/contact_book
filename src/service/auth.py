@@ -78,4 +78,12 @@ class Auth:
             raise credentials_exception
         return user
 
+
+    def create_emial_token(self, data: dict):
+        to_encode = data.copy()
+        expire = datetime.utcnow() + timedelta(days=7)
+        to_encode.update({"iat": datetime.utcnow(), "exp": expire})
+        token = jwt.encode(to_encode, self.SECRET_KEY, algorithm=self.ALGORITHM)
+        return token
+
 auth_service = Auth()
