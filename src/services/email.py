@@ -23,7 +23,6 @@ conf = ConnectionConfig(
     VALIDATE_CERTS=os.getenv("VALIDATE_CERTS"),
     TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
 )
-print()
 
 async def send_email(email: EmailStr, username: str, host: str):
     try:
