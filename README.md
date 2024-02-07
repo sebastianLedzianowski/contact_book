@@ -21,9 +21,11 @@ During the registration process, users are required to confirm their email addre
 
 - 🐍 Python 3.10+
 - ⚡ FastAPI(REST API)
-- 🐘 SQLAlchemy
 - 🐘 PostgresSQL
+- 🐘 SQLAlchemy
 - 📘 Pydantic
+- 🔄 Redis
+- 🐳 Docker-compose
 
 ## Installation ⬇️
 
@@ -58,7 +60,7 @@ During the registration process, users are required to confirm their email addre
 To run this project, you will need to add the following environment variables to your `.env` file.
 
 ```bash
-#PostgreSQL DateBase
+#PostgresSQL DateBase
 SQLALCHEMY_DATABASE_URL=
 #Authentication and token generation
 SECRET_KEY=
@@ -83,25 +85,22 @@ VALIDATE_CERTS=
 
 ## Installation ⬇️
 
-1.Let's run a Docker container to create a PostgresSQL server using the following command:
+1.Let's launch Docker containers to create a PostgresSQL and Redis server using the following command:
 
 ```bash
-docker run --name db-postgres -p 5432:5432 -e POSTGRES_PASSWORD=567234 -d postgres
-
+docker-compose up 
 ```
 
 2.Now, let's apply the initial migration:
 
 ```bash
 alembic upgrade head
-
 ```
 
 3.Run the application:
 
 ```bash
 uvicorn main:app --host localhost --port 8000 --reload
-
 ```
 
 ## User Instructions 🚀
