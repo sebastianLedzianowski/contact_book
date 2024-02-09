@@ -11,6 +11,10 @@ During the registration process, users are required to confirm their email addre
 - ⏳ **User Caching:** Mechanism allowing user caching in the application to optimize data access and improve performance.
 - 🔒 **Implementation of Authentication Mechanism:** Securing the application by introducing a user authentication mechanism.
 - 🗝️ **Implementation of Authorization Mechanism using JWT Tokens:** Ensuring that all operations on contacts are performed only by registered users.
+- 🚧 **Rate Limiting for API Throttling:** Throttle the number of requests to the API to prevent abuse, protect against DDoS attacks, and manage resource consumption efficiently.
+- 🛡️ **Enhanced Security Measures:** Implementation of additional security measures to safeguard against various forms of abuse and spam.
+- 🔄 **Cross-Origin Resource Sharing (CORS):** Implementation to facilitate resource sharing between servers located in different domains, enhancing security against cross-domain scripting (XSS) and cross-site request forgery (CSRF) attacks.
+- ☁️ **Cloudinary Integration for Avatar Storage:** Storage of avatars in the cloud using [Cloudinary](https://cloudinary.com) for enhanced scalability and availability.
 - 📅 **Tracking Upcoming Birthdays:** Feature for monitoring upcoming birthdays among contacts.
 - ➕ **Adding Contacts:** Ability to add new contacts to the application.
 - ✏️ **Editing Contacts:** Feature allowing the editing of existing contact details.
@@ -26,6 +30,7 @@ During the registration process, users are required to confirm their email addre
 - 📘 Pydantic
 - 🔄 Redis
 - 🐳 Docker-compose
+- ☁️ Cloudinary(Cloud file storage)
 
 ## Installation ⬇️
 
@@ -75,18 +80,24 @@ MAIL_STARTTLS=
 MAIL_SSL_TLS=
 USE_CREDENTIALS=
 VALIDATE_CERTS=
-#Docker-composo settings
+#Docker-compose Postgres
 POSTGRES_DB=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
+POSTGRES_PORT=
+#Docker-compose Redis
 REDIS_HOST=
 REDIS_PORT=
 REDIS_DB=
+#Cloudinary
+CLOUDINARY_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 ```
 
 ---
 
-**Note**: Ensure to keep your `.env` file secure and never commit it to the repository to protect sensitive information.
+**Note:** Ensure to keep your `.env` file secure and never commit it to the repository to protect sensitive information.
 
 ---
 
@@ -144,17 +155,34 @@ uvicorn main:app --host localhost --port 8000 --reload
 2. Use the "Try it out" button and enter the number of days into the future.
 3. Click "Execute" and check the response.
 
+### 4. Updating Avatar
+
+### Updating Avatar:
+
+1. After logging in, go to the /users/avatar tab.
+2. Use the "Try it out" button and upload an image file for the avatar.
+3. Click "Execute" and check the response.
+4. Your avatar is now updated. You can retrieve it using the /users/me/ endpoint.
+
+---
+
+**Note:** Make sure to adhere to the rate limits specified for each operation. The avatar can be updated using the provided FastAPI route /users/avatar, which allows users to change their avatar by uploading a new image file. The uploaded image is securely stored using Cloudinary, and the user's avatar URL is updated in the database.
+
+---
+
 ### Additional Information
 
 - 🌐 All contact operations are available only for logged-in users.
 - 👤 Each user has access only to their contact operations.
 - 🔐 Remember to log in correctly before using the contact-related functions.
 
+---
+
 **Note:**
 - If you don't have an account yet, register using the "Registration" option.
 - After registering, use the "Login" option to access the contact adding and birthday tracking functions.
 
-
+---
 
 ## Created 👤
 
