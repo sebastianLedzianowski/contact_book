@@ -3,7 +3,7 @@ services:
   redis:
     image: redis:alpine
     ports:
-      - "6379:6379"
+      - "6379:${REDIS_PORT}"
   postgres:
     image: postgres:12
     environment:
@@ -11,6 +11,6 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - "5432:5432"
+      - "5432:${POSTGRES_PORT}"
     volumes:
       - ./postgres-data:/var/lib/postgresql/data
