@@ -1,13 +1,29 @@
 import redis.asyncio as redis
+
 from fastapi import FastAPI, HTTPException
 from fastapi_limiter import FastAPILimiter
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 from src.routes import contacts, auth
+
 import os
 from dotenv import load_dotenv
 load_dotenv()
 
 app = FastAPI()
+
+origins = [
+    "http://localhost:8000"
+    ]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(auth.router, prefix='/api')
 app.include_router(contacts.router, prefix='/api')
@@ -22,7 +38,7 @@ async def startup():
     await FastAPILimiter.init(r)
 
 @app.get("/")
-def read_root():
+async def read_root():
     return {"message": "Hello World"}
 
 @app.exception_handler(HTTPException)
