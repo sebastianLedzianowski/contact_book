@@ -25,7 +25,7 @@ class UserDb(BaseModel):
     username: str
     email: EmailStr
     created_at: datetime
-    avatar: str
+    avatar: str | None
 
     class Config:
         from_attributes = True
