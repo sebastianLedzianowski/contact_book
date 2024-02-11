@@ -29,6 +29,8 @@ redis = "^5.0.1"
 fastapi-limiter = "^0.1.6"
 cloudinary = "^1.38.0"
 pydantic-settings = "^2.1.0"
+pytest = "^8.0.0"
+pytest-cov = "^4.1.0"
 
 
 [build-system]
