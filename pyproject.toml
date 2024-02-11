@@ -31,6 +31,7 @@ cloudinary = "^1.38.0"
 pydantic-settings = "^2.1.0"
 pytest = "^8.0.0"
 pytest-cov = "^4.1.0"
+httpx = "^0.26.0"
 
 
 [build-system]
