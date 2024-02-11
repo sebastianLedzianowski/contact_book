@@ -29,3 +29,15 @@ class User(Base):
     avatar = Column(String(255), nullable=True)
     refresh_token = Column(String(255), nullable=True)
     confirmed = Column(Boolean, default=False)
+
+    def dict(self):
+        return {
+            "id": self.id,
+            "username": self.username,
+            "email": self.email,
+            "password": self.password,
+            "created_at": self.created_at,
+            "avatar": self.avatar,
+            "refresh_token": self.refresh_token,
+            "confirmed": self.confirmed,
+        }
