@@ -1,6 +1,5 @@
 from typing import Type
 
-from libgravatar import Gravatar
 from sqlalchemy.orm import Session
 
 from src.database.models import User
