@@ -11,11 +11,11 @@ from faker import Faker
 fake = Faker("pl_PL")
 
 
-async def get_contacts(skip: int, limit: int, user: User, db: Session) -> List[Contact]:
+async def get_contacts(skip: int, limit: int, user: User, db: Session) -> List[Contact] | None:
     return db.query(Contact).filter(Contact.user_id == user.id).offset(skip).limit(limit).all()
 
 
-async def get_contact(contact_id: int, user: User, db: Session) -> Contact:
+async def get_contact(contact_id: int, user: User, db: Session) -> Contact | None:
     return db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
 
 
@@ -58,22 +58,6 @@ async def update_contact(contact_id: int, user: User, body: ContactResponse, db:
     return contact
 
 
-async def faker_create_contact(contact_id: int, user: User, db: Session) -> Contact:
-    contact = Contact(
-        id=contact_id,
-        user_id=user.id,
-        name=fake.first_name(),
-        lastname=fake.last_name(),
-        phone_number=fake.phone_number(),
-        email=fake.email(),
-        birthday=fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
-    )
-    db.add(contact)
-    db.commit()
-    db.refresh(contact)
-    return contact
-
-
 async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> List[Contact] | None:
     today = date.today()
     upcoming_birthdays_list = []
@@ -113,3 +97,19 @@ async def searchable_by(choice: str, user: User, db: Session) -> List[Contact] |
                 birthday=contact.birthday
             ))
     return list_contacts
+
+
+async def faker_create_contact(contact_id: int, user: User, db: Session) -> Contact:
+    contact = Contact(
+        id=contact_id,
+        user_id=user.id,
+        name=fake.first_name(),
+        lastname=fake.last_name(),
+        phone_number=fake.phone_number(),
+        email=fake.email(),
+        birthday=fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
+    )
+    db.add(contact)
+    db.commit()
+    db.refresh(contact)
+    return contact
