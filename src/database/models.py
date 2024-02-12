@@ -1,6 +1,5 @@
 from sqlalchemy import Column, Integer, String, func
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, declarative_base
 from sqlalchemy.sql.sqltypes import DateTime, Boolean
 from sqlalchemy.sql.schema import ForeignKey
 
@@ -30,7 +29,7 @@ class User(Base):
     refresh_token = Column(String(255), nullable=True)
     confirmed = Column(Boolean, default=False)
 
-    def dict(self):
+    def model_dump(self):
         return {
             "id": self.id,
             "username": self.username,

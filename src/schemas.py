@@ -10,7 +10,7 @@ class ContactResponse(BaseModel):
     email: EmailStr | None = Field(default=None)
     phone_number: str = Field(max_length=20, example="+48 876 654 765")
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
@@ -27,7 +27,7 @@ class UserDb(BaseModel):
     created_at: datetime
     avatar: str | None
 
-    class Config:
+    class ConfigDict:
         from_attributes = True
 
 
