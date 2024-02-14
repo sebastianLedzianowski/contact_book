@@ -110,16 +110,17 @@ def test_request_email_confirmed(client, session, user, monkeypatch):
     assert data["message"] == "Your email is already confirmed."
 
 
-def test_refresh_token_invalid(client, session, user, monkeypatch):
+def test_refresh_token_user_not_found(client, session, user, monkeypatch):
     login_user_token_created(client, session, user, monkeypatch)
-    user_fresh: user = session.query(User).filter(User.email == user.get('email')).first()
+    user = session.query(User).filter(User.email == user.get('email')).first()
     response = client.get(
         '/api/auth/refresh_token',
-        headers={'Authorization': f'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsZWR6aWFub3dza2lAbzIucGwiLCJpYXQiOjE3MDc4NDY5NDMsImV4cCI6MTcwODQ1MTc0Mywic2NvcGUiOiJyZWZyZXNoX3Rva2VuIn0.VLX28ls8AB6-JHWkKynSRFktDDk-Gteb0vMbS9dDppE'}
+        headers={
+            'Authorization': f'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJsZWR6aWFub3dza2lAbzIucGwiLCJpYXQiOjE3MDc4NDY5NDMsImV4cCI6MTcwODQ1MTc0Mywic2NvcGUiOiJyZWZyZXNoX3Rva2VuIn0.VLX28ls8AB6-JHWkKynSRFktDDk-Gteb0vMbS9dDppE'}
     )
     assert response.status_code == 401, response.text
     data = response.json()
-    assert data['detail'] == 'Invalid refresh token'
+    assert data['detail'] == 'User not found.'
 
 
 def test_refresh_token(client, session, user, monkeypatch):
@@ -134,3 +135,33 @@ def test_refresh_token(client, session, user, monkeypatch):
     assert 'access_token' in data
     assert 'refresh_token' in data
     assert 'token_type' in data
+
+
+def test_confirmed_email_user_is_none(client, session, user, monkeypatch):
+    create_user(client, user, monkeypatch)
+    response = client.get(
+        '/api/auth/confirmed_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmNsdWRpbmdAbzIucGwiLCJpYXQiOjE3MDc5MzQwNTQsImV4cCI6MTcwODUzODg1NH0.UCeSStDqYvSXGjiR7WHaLPstjh9yQZHC6s9kAm00NmI'
+    )
+    assert response.status_code == 400, response.text
+    data = response.json()
+    assert data['detail'] == 'Verification error.'
+
+
+def test_confirmed_email_user_confirmed(client, session, user, monkeypatch):
+    login_user_confirmed_true(client, session, user, monkeypatch)
+    response = client.get(
+        'http://localhost:8000/api/auth/confirmed_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmNsdWRpbmdAbzIucGwiLCJpYXQiOjE3MDc5MzQwNTQsImV4cCI6MTcwODUzODg1NH0.UCeSStDqYvSXGjiR7WHaLPstjh9yQZHC6s9kAm00NmI'
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data['message'] == 'Your email is already confirmed.'
+
+
+def test_confirmed_email(client, user, monkeypatch):
+    create_user(client, user, monkeypatch)
+    response = client.get(
+        'http://localhost:8000/api/auth/confirmed_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmNsdWRpbmdAbzIucGwiLCJpYXQiOjE3MDc5MzQwNTQsImV4cCI6MTcwODUzODg1NH0.UCeSStDqYvSXGjiR7WHaLPstjh9yQZHC6s9kAm00NmI'
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    assert data['message'] == 'Email confirmed.'
