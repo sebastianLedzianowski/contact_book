@@ -23,7 +23,7 @@ During the registration process, users are required to confirm their email addre
 
 ## Requirements
 
-- 🐍 Python 3.10+
+- 🐍 Python 3.11+
 - ⚡ FastAPI(REST API)
 - 🐘 PostgresSQL
 - 🐘 SQLAlchemy

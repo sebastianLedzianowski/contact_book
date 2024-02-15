@@ -29,7 +29,7 @@ class User(Base):
     refresh_token = Column(String(255), nullable=True)
     confirmed = Column(Boolean, default=False)
 
-    def model_dump(self):
+    def dict(self):
         return {
             "id": self.id,
             "username": self.username,
