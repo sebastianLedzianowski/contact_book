@@ -1,7 +1,13 @@
 import json
-from unittest.mock import MagicMock
-
+import time
+from unittest.mock import MagicMock, AsyncMock
+from src.repository.users import create_user
 from src.database.models import User
+from src.services.auth import auth_service
+
+
+def create_user_db(user, session):
+    create_user(user, session)
 
 
 def create_user(client, user, monkeypatch):
@@ -88,26 +94,7 @@ def test_login_user(client, session, user, monkeypatch):
     assert data["token_type"] == "bearer"
 
 
-def test_request_email(client, user, monkeypatch):
-    create_user(client, user, monkeypatch)
-    response = client.post(
-        "/api/auth/request_email",
-        data=json.dumps({"email": user.get('email')}),
-    )
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["message"] == "Check your email for confirmation."
 
-
-def test_request_email_confirmed(client, session, user, monkeypatch):
-    login_user_confirmed_true(client, session, user, monkeypatch)
-    response = client.post(
-        "/api/auth/request_email",
-        data=json.dumps({"email": user.get('email')}),
-    )
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["message"] == "Your email is already confirmed."
 
 
 def test_refresh_token_user_not_found(client, session, user, monkeypatch):
@@ -121,6 +108,38 @@ def test_refresh_token_user_not_found(client, session, user, monkeypatch):
     assert response.status_code == 401, response.text
     data = response.json()
     assert data['detail'] == 'User not found.'
+
+
+def test_refresh_token_invalid_user(client, session, user, monkeypatch):
+    login_user_token_created(client, session, user, monkeypatch)
+    user_token: User = session.query(User).filter(User.email == user.get('email')).first()
+
+    async def mock_decode_refresh_token(token):
+        return user.get('email')
+
+    monkeypatch.setattr(auth_service, "decode_refresh_token", AsyncMock(side_effect=mock_decode_refresh_token))
+
+
+    response = client.get(
+        '/api/auth/refresh_token',
+        headers={
+            'Authorization': f'Bearer invalid_token'}
+    )
+
+    assert response.status_code == 401
+    data = response.json()
+    assert data['detail'] == 'Invalid refresh token.'
+
+def test_refresh_token_invalid(client, session, user, monkeypatch):
+    login_user_token_created(client, session, user, monkeypatch)
+    user_token: User = session.query(User).filter(User.email == user.get('email')).first()
+    response = client.get(
+        '/api/auth/refresh_token',
+        headers={'Authorization': f'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkZWFkcG9vbEBleGFtcGxlLmNvbSIsImlhdCI6MTcwODAxMzU2NiwiZXhwIjoxNzA4MDEzNTY5LCJzY29wZSI6InJlZnJlc2hfdG9rZW4ifQ.vgOC-tahgGd2Tnh90kMoSR0MtQzMocsNd116R8UWRmM'}
+    )
+    assert response.status_code == 401, response.text
+    data = response.json()
+    assert data['detail'] == 'Invalid refresh token.'
 
 
 def test_refresh_token(client, session, user, monkeypatch):
@@ -149,19 +168,59 @@ def test_confirmed_email_user_is_none(client, session, user, monkeypatch):
 
 def test_confirmed_email_user_confirmed(client, session, user, monkeypatch):
     login_user_confirmed_true(client, session, user, monkeypatch)
+    user_token: User = session.query(User).filter(User.email == user.get('email')).first()
+
+    async def mock_decode_confirmed_email_token(token):
+        return user.get('email')
+
+    monkeypatch.setattr(auth_service, "get_email_from_token",
+                        AsyncMock(side_effect=mock_decode_confirmed_email_token))
+
     response = client.get(
-        'http://localhost:8000/api/auth/confirmed_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmNsdWRpbmdAbzIucGwiLCJpYXQiOjE3MDc5MzQwNTQsImV4cCI6MTcwODUzODg1NH0.UCeSStDqYvSXGjiR7WHaLPstjh9yQZHC6s9kAm00NmI'
+        f'/api/auth/confirmed_email/your_email_is_already_confirmed'
     )
     assert response.status_code == 200, response.text
     data = response.json()
     assert data['message'] == 'Your email is already confirmed.'
 
 
-def test_confirmed_email(client, user, monkeypatch):
+def test_confirmed_email(client, session, user, monkeypatch):
     create_user(client, user, monkeypatch)
+    user_token: User = session.query(User).filter(User.email == user.get('email')).first()
+
+    async def mock_decode_confirmed_email_token(token):
+        return user.get('email')
+
+    monkeypatch.setattr(auth_service, "get_email_from_token",
+                        AsyncMock(side_effect=mock_decode_confirmed_email_token))
+
     response = client.get(
-        'http://localhost:8000/api/auth/confirmed_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmNsdWRpbmdAbzIucGwiLCJpYXQiOjE3MDc5MzQwNTQsImV4cCI6MTcwODUzODg1NH0.UCeSStDqYvSXGjiR7WHaLPstjh9yQZHC6s9kAm00NmI'
+        '/api/auth/confirmed_email/email_confirmed'
     )
     assert response.status_code == 200, response.text
     data = response.json()
     assert data['message'] == 'Email confirmed.'
+
+
+def test_request_email_confirmed(client, session, user, monkeypatch):
+    login_user_confirmed_true(client, session, user, monkeypatch)
+    response = client.post(
+        "/api/auth/request_email",
+        data=json.dumps({"email": user.get('email')}),
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    print(data)
+    assert data["message"] == "Your email is already confirmed."
+
+
+def test_request_email(client, user, monkeypatch):
+    create_user(client, user, monkeypatch)
+    response = client.post(
+        "/api/auth/request_email",
+        data=json.dumps({"email": user.get('email')}),
+    )
+    assert response.status_code == 200, response.text
+    data = response.json()
+    print(data)
+    assert data["message"] == "Check your email for confirmation."

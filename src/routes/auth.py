@@ -50,8 +50,12 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
 
 @router.get('/refresh_token', response_model=TokenModel)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
-    token = credentials.credentials
-    email = await auth_service.decode_refresh_token(token)
+    try:
+        token = credentials.credentials
+        email = await auth_service.decode_refresh_token(token)
+    except Exception:
+        return JSONResponse(status_code=401, content={"detail": "Invalid refresh token."})
+
     user = await repository_users.get_user_by_email(email, db)
 
     if user is None:
@@ -86,7 +90,6 @@ async def request_email(body: RequestEmail, background_tasks: BackgroundTasks, r
 
     if user.confirmed:
         return {"message": "Your email is already confirmed."}
-    if user:
+    if user.confirmed is False:
         background_tasks.add_task(send_email, user.email, user.username, request.base_url)
-    return {"message": "Check your email for confirmation."}
-
+        return {"message": "Check your email for confirmation."}

@@ -14,7 +14,7 @@ engine = create_engine(
 )
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function", autouse=True)
 def session():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
@@ -25,7 +25,7 @@ def session():
     finally:
         db.close()
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def client(session):
     def override_get_db():
         try:
@@ -37,6 +37,6 @@ def client(session):
 
     yield TestClient(app)
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def user():
     return {"username": "deadpool", "email": "deadpool@example.com", "password": "123456789"}
