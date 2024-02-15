@@ -67,13 +67,6 @@ async def remove_contact(contact_id: int, db: Session = Depends(get_db),
     return contact
 
 
-@router.post("/faker_created_contacts/{contact_id}",
-             response_model=ContactResponse, status_code=status.HTTP_201_CREATED,
-             description='No more than 10 requests per minute', dependencies=[Depends(rate_limit)])
-async def faker_create_contact(contact_id: int, db: Session = Depends(get_db),
-                               current_user: User = Depends(auth_service.get_current_user)) -> Any:
-    return await repository_contact.faker_create_contact(contact_id, current_user, db)
-
 
 @router.get("/upcoming_birthdays/{days_in_future}", response_model=List[ContactResponse],
             description='No more than 10 requests per minute', dependencies=[Depends(rate_limit)])
