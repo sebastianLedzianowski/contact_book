@@ -29,6 +29,7 @@ During the registration process, users are required to confirm their email addre
 - 🐘 SQLAlchemy
 - 📘 Pydantic
 - 🔄 Redis
+- 🐳 Dockerfile
 - 🐳 Docker-compose
 - ☁️ Cloudinary(Cloud file storage)
 
@@ -46,26 +47,10 @@ During the registration process, users are required to confirm their email addre
     cd contact_book
     ```
 
-3. **Set up a virtual environment and activate it (optional but recommended):**
-
-    ```bash
-    virtualenv venv
-    source venv/bin/activate  # On Windows, use `venv\Scripts\activate`
-    ```
-
-4. **Install dependencies using Poetry:**
-
-    ```bash
-    pip install poetry
-    poetry install
-    ```
-
-## Configuration ⚙️
-
-To run this project, you will need to add the following environment variables to your `.env` file.
+3. **Add the `.env` file with the following settings:**
 
 ```bash
-#PostgresSQL DateBase
+#PostgreSQL Date Base
 SQLALCHEMY_DATABASE_URL=
 #Authentication and token generation
 SECRET_KEY=
@@ -75,20 +60,20 @@ MAIL_USERNAME=
 MAIL_PASSWORD=
 MAIL_PORT=
 MAIL_SERVER=
-MAIL_FROM_NAME=
+MAIL_FROM=
 MAIL_STARTTLS=
 MAIL_SSL_TLS=
 USE_CREDENTIALS=
 VALIDATE_CERTS=
+#Docker-compose Redis
+REDIS_HOST=
+REDIS_PORT=
+REDIS_DB=
 #Docker-compose Postgres
 POSTGRES_DB=
 POSTGRES_USER=
 POSTGRES_PASSWORD=
 POSTGRES_PORT=
-#Docker-compose Redis
-REDIS_HOST=
-REDIS_PORT=
-REDIS_DB=
 #Cloudinary
 CLOUDINARY_NAME=
 CLOUDINARY_API_KEY=
@@ -101,24 +86,16 @@ CLOUDINARY_API_SECRET=
 
 ---
 
-## Installation ⬇️
-
-1.Let's launch Docker containers to create a PostgresSQL and Redis server using the following command:
+4. Create Docker containers to create the PostgresQL server, Redis and the applications itself with the following command:
 
 ```bash
-docker-compose up 
+docker-compose build
 ```
 
-2.Now, let's apply the initial migration:
+5. Run Docker containers:
 
 ```bash
-alembic upgrade head
-```
-
-3.Run the application:
-
-```bash
-uvicorn main:app --host localhost --port 8000 --reload
+docker-compose up
 ```
 
 ## User Instructions 🚀
@@ -126,43 +103,39 @@ uvicorn main:app --host localhost --port 8000 --reload
 ### 1. Registration and Login
 
 ### Registration:
-1. Go to the API in your browser: http://127.0.0.1:8000/docs. 
-2. Navigate to the /signup tab.
-3. Use the "Try it out" button and provide user details (e.g., username, password) for registration.
-4. Click "Execute" to send the registration request.
-5. Check your email inbox for a verification message.
-6. Open the verification email and click on the provided activation link.
-7. Once the activation link is clicked, return to the API or refresh the browser.
-8. You should now be successfully registered and activated. Check the response for confirmation.
+- Go to the API in your browser: http://0.0.0.0:8000/docs. 
+- Navigate to the /signup tab.
+- Use the "Try it out" button and provide user details (e.g., username, password) for registration.
+- Click "Execute" to send the registration request.
+- Check your email inbox for a verification message.
+- Open the verification email and click on the provided activation link.
+- Once the activation link is clicked, return to the API or refresh the browser.
+- You should now be successfully registered and activated. Check the response for confirmation.
 
 ### Login:
-1. Go to the API in your browser: http://127.0.0.1:8000/docs.
-2. Navigate to the `/login` tab.
-3. Use the "Try it out" button and provide login credentials (e.g., username, password).
-4. Click "Execute" and check the response.
+- Go to the API in your browser: http://0.0.0.0:8000/docs.
+- Navigate to the `/login` tab.
+- Use the "Try it out" button and provide login credentials (e.g., username, password).
+- Click "Execute" and check the response.
 
 ### 2. Adding Contacts
 
-### Adding Contacts:
-1. After logging in, go to the `/contact` tab.
-2. Use the "Try it out" button and provide contact details.
-3. Click "Execute" and check the response.
+- After logging in, go to the `/contact` tab.
+- Use the "Try it out" button and provide contact details.
+- Click "Execute" and check the response.
 
 ### 3. Tracking Upcoming Birthdays
 
-### Tracking Birthdays:
-1. After logging in, go to the `/api/contact/upcoming_birthdays/{days_in_future}` tab.
-2. Use the "Try it out" button and enter the number of days into the future.
-3. Click "Execute" and check the response.
+- After logging in, go to the `/api/contact/upcoming_birthdays/{days_in_future}` tab.
+- Use the "Try it out" button and enter the number of days into the future.
+- Click "Execute" and check the response.
 
 ### 4. Updating Avatar
 
-### Updating Avatar:
-
-1. After logging in, go to the /users/avatar tab.
-2. Use the "Try it out" button and upload an image file for the avatar.
-3. Click "Execute" and check the response.
-4. Your avatar is now updated. You can retrieve it using the /users/me/ endpoint.
+- After logging in, go to the /users/avatar tab.
+- Use the "Try it out" button and upload an image file for the avatar.
+- Click "Execute" and check the response.
+- Your avatar is now updated. You can retrieve it using the /users/me/ endpoint.
 
 ---
 
@@ -178,11 +151,6 @@ uvicorn main:app --host localhost --port 8000 --reload
 
 ---
 
-**Note:**
-- If you don't have an account yet, register using the "Registration" option.
-- After registering, use the "Login" option to access the contact adding and birthday tracking functions.
-
----
 
 ## Created 👤
 
