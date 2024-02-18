@@ -1,9 +1,11 @@
 import redis.asyncio as redis
+import uvicorn
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Depends
 from fastapi_limiter import FastAPILimiter
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi_limiter.depends import RateLimiter
 
 from src.routes import contacts, auth, users
 
@@ -29,6 +31,8 @@ app.include_router(auth.router, prefix='/api')
 app.include_router(contacts.router, prefix='/api')
 app.include_router(users.router, prefix='/api')
 
+rate_limit = RateLimiter(times=10, seconds=60)
+
 @app.on_event("startup")
 async def startup():
     r = await redis.Redis(host=os.getenv("REDIS_HOST"),
@@ -38,7 +42,7 @@ async def startup():
                           decode_responses=True)
     await FastAPILimiter.init(r)
 
-@app.get("/")
+@app.get("/", dependencies=[Depends(rate_limit)])
 async def read_root():
     return {"message": "Hello World"}
 
@@ -48,3 +52,7 @@ async def exception_limit_handling(request, exc):
         return JSONResponse(content={"detail": "Too many requests, no more than 10 per minute."},
                             status_code=429)
     return exc
+
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True)
