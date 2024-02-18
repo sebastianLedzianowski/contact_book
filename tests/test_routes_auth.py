@@ -1,13 +1,8 @@
 import json
-import time
 from unittest.mock import MagicMock, AsyncMock
 from src.repository.users import create_user
 from src.database.models import User
 from src.services.auth import auth_service
-
-
-def create_user_db(user, session):
-    create_user(user, session)
 
 
 def create_user(client, user, monkeypatch):
@@ -91,10 +86,10 @@ def test_login_user(client, session, user, monkeypatch):
     )
     assert response.status_code == 200, response.text
     data = response.json()
+    print(data)
+    assert 'access_token' in data
+    assert 'refresh_token' in data
     assert data["token_type"] == "bearer"
-
-
-
 
 
 def test_refresh_token_user_not_found(client, session, user, monkeypatch):
@@ -153,7 +148,7 @@ def test_refresh_token(client, session, user, monkeypatch):
     data = response.json()
     assert 'access_token' in data
     assert 'refresh_token' in data
-    assert 'token_type' in data
+    assert data["token_type"] == "bearer"
 
 
 def test_confirmed_email_user_is_none(client, session, user, monkeypatch):
