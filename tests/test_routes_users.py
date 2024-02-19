@@ -6,11 +6,10 @@ from src.routes.users import rate_limit
 def test_read_users_me(client, user, session, monkeypatch):
     login_user_token_created(client, session, user, monkeypatch)
     user_authorization: User = session.query(User).filter(User.email == user.get('email')).first()
+    response = client.get(
+        '/api/users/me/',
+        headers={'Authorization': f'Bearer {user_authorization.refresh_token}'})
 
-    response = client.get("/api/users/me/",
-            headers={'username': user.get('email'),
-                     'password': user.get('password')},
-        )
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["username"] == user.get('username')
@@ -24,9 +23,7 @@ def test_read_users_me_tate_limit(client, user, session, monkeypatch):
 
     for _ in range(rate_limit.times + 1):
         response = client.get("/api/users/me/",
-            headers={'username': user.get('email'),
-                     'password': user.get('password')},
-        )
+                              headers={'Authorization': f"Bearer {user_authorization.refresh_token}"})
 
     assert response.status_code == 429, response.text
     data = response.json()
