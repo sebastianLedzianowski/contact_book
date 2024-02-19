@@ -50,17 +50,12 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
 
 @router.get('/refresh_token', response_model=TokenModel)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
-    try:
-        token = credentials.credentials
-        email = await auth_service.decode_refresh_token(token)
-    except Exception:
-        return JSONResponse(status_code=401, content={"detail": "Invalid refresh token."})
+    token = credentials.credentials
+    email = await auth_service.decode_refresh_token(token)
 
     user = await repository_users.get_user_by_email(email, db)
 
-    if user is None:
-        return JSONResponse(status_code=401, content={"detail": "User not found."})
-    elif user.refresh_token != token:
+    if user.refresh_token != token:
         await repository_users.update_token(user, None, db)
         return JSONResponse(status_code=401, content={"detail": "Invalid refresh token."})
 

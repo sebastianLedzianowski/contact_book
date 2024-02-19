@@ -39,4 +39,18 @@ def client(session):
 
 @pytest.fixture(scope="function")
 def user():
-    return {"username": "deadpool", "email": "deadpool@example.com", "password": "123456789"}
+    class UserTest:
+        def __init__(self, username, email, password):
+            self.username = username
+            self.email = email
+            self.password = password
+
+        def dict(self):
+            return {
+                "username": self.username,
+                "email": self.email,
+                "password": self.password
+            }
+    return UserTest(username="deadpool",
+                    email="deadpool@example.com",
+                    password="123456789")

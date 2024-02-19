@@ -15,12 +15,12 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 rate_limit = RateLimiter(times=10, seconds=60)
 
-@router.get("/me/", response_model=UserDb, dependencies=[Depends(rate_limit)])
+@router.get("/me/", response_model=UserDb)
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
     return current_user
 
 
-@router.patch('/avatar', response_model=UserDb, dependencies=[Depends(rate_limit)])
+@router.patch('/avatar', response_model=UserDb)
 async def update_avatar_user(file: UploadFile = File(),
                              current_user: User = Depends(auth_service.get_current_user),
                              db: Session = Depends(get_db)):
