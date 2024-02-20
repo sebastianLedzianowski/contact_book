@@ -41,8 +41,8 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
     if not auth_service.verify_password(body.password, user.password):
         return JSONResponse(status_code=401, content={"detail": "Invalid password."})
 
-    access_token = await auth_service.create_access_token(data={"sub": user.email})
-    refresh_token_ = await auth_service.create_refresh_token(data={"sub": user.email})
+    access_token = auth_service.create_access_token(data={"sub": user.email})
+    refresh_token_ = auth_service.create_refresh_token(data={"sub": user.email})
 
     await repository_users.update_token(user, refresh_token_, db)
     return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
@@ -52,15 +52,14 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
-
     user = await repository_users.get_user_by_email(email, db)
 
     if user.refresh_token != token:
         await repository_users.update_token(user, None, db)
         return JSONResponse(status_code=401, content={"detail": "Invalid refresh token."})
 
-    access_token = await auth_service.create_access_token(data={"sub": email})
-    refresh_token_ = await auth_service.create_refresh_token(data={"sub": email})
+    access_token = auth_service.create_access_token(data={"sub": email})
+    refresh_token_ = auth_service.create_refresh_token(data={"sub": email})
 
     await repository_users.update_token(user, refresh_token_, db)
     return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
