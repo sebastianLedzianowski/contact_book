@@ -19,7 +19,7 @@ During the registration process, users are required to confirm their email addre
 - ➕ **Adding Contacts:** Ability to add new contacts to the application.
 - ✏️ **Editing Contacts:** Feature allowing the editing of existing contact details.
 - ❌ **Deleting Contacts:** Ability to remove unnecessary contacts from the list.
-- 🧪 **Generating Fake Contacts for Testing Purposes:** Allows adding artificial contact data for testing purposes.
+- 📚 **API Documentation:** Explore the detailed API documentation.
 
 ## Requirements
 
@@ -136,6 +136,20 @@ docker-compose up
 - Use the "Try it out" button and upload an image file for the avatar.
 - Click "Execute" and check the response.
 - Your avatar is now updated. You can retrieve it using the /users/me/ endpoint.
+
+### 5. Documentation
+
+In our documentation you will find detailed information on configuration, API use and implementation instructions.
+
+To generate documentation locally, follow these steps:
+
+1. Go to the `docs` directory.
+
+2. Run the command:
+
+```bash
+make html
+```
 
 ---
 
