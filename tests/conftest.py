@@ -4,8 +4,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from main import app
-from src.database.models import Base
+from src.database.models import Base, User
 from src.database.db import get_db
+from src.services.auth import auth_service
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -54,3 +55,31 @@ def user():
     return UserTest(username="deadpool",
                     email="deadpool@example.com",
                     password="123456789")
+
+
+def create_user_db(body: user, db: session):
+    new_user = User(**body.dict())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
+
+def login_user_confirmed_true_and_hash_password(user, session):
+    create_user_db(user, session)
+    user_update: User = session.query(User).filter(User.email == user.email).first()
+    user_update.password = auth_service.get_password_hash(user_update.password)
+    user_update.confirmed = True
+    session.commit()
+
+
+def login_user_token_created(user, session):
+    login_user_confirmed_true_and_hash_password(user, session)
+    new_user: User = session.query(User).filter(User.email == user.email).first()
+
+    access_token = auth_service.create_access_token(data={"sub": new_user.email})
+    refresh_token_ = auth_service.create_refresh_token(data={"sub": new_user.email})
+
+    new_user.refresh_token = refresh_token_
+    session.commit()
+
+    return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}

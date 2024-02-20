@@ -1,42 +1,10 @@
 import json
 from unittest.mock import MagicMock, AsyncMock
 from src.database.models import User
-from src.repository.users import update_token, get_user_by_email
 from src.services.auth import auth_service
-from tests.conftest import session, user
+from tests.conftest import login_user_token_created, create_user_db, \
+    login_user_confirmed_true_and_hash_password
 
-
-def create_user_db(body: user, db: session):
-    new_user = User(**body.dict())
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-
-
-def login_user_confirmed_true_and_hash_password(user, session):
-    create_user_db(user, session)
-    user_update: User = session.query(User).filter(User.email == user.email).first()
-    user_update.password = auth_service.get_password_hash(user_update.password)
-    user_update.confirmed = True
-    session.commit()
-
-
-async def login_user_token_created(user, session):
-    login_user_confirmed_true_and_hash_password(user, session)
-    session.commit()
-    new_user: User = session.query(User).filter(User.email == user.email).first()
-
-    access_token = auth_service.create_access_token(data={"sub": new_user.email})
-    refresh_token_ = auth_service.create_refresh_token(data={"sub": new_user.email})
-
-    return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
-
-async def user_refresh_token_saved(user, session):
-    response = await login_user_token_created(user, session)
-    data = response.__dict__
-    new_user: User = session.query(User).filter(User.email == user.email).first()
-    new_user.refresh_token = data.get('refresh_token')
-    session.commit()
 
 def test_create_user(client, user, monkeypatch):
     mock_send_email = MagicMock()
@@ -48,6 +16,7 @@ def test_create_user(client, user, monkeypatch):
     data = response.json()
     assert data["user"]["email"] == user.email
     assert "id" in data["user"]
+    assert data['detail'] == "User successfully created. Check your email for confirmation."
 
 
 def test_repeat_create_user(user, session, client):
