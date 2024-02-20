@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 rate_limit = RateLimiter(times=10, seconds=60)
 
-@router.get("/me/", response_model=UserDb)
+@router.get("/me/", response_model=UserDb, dependencies=[Depends(rate_limit)])
 async def read_users_me(current_user: User = Depends(auth_service.get_current_user)):
     return current_user
 
