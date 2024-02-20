@@ -14,7 +14,21 @@ security = HTTPBearer()
 
 
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
-async def signup(body: UserModel, background_tasks: BackgroundTasks, request: Request, db: Session = Depends(get_db)):
+async def signup(body: UserModel,
+                 background_tasks: BackgroundTasks,
+                 request: Request, db: Session = Depends(get_db)) -> dict:
+    """
+    Sign up a new user.
+
+    Args:
+        body (UserModel): Data for the new user.
+        background_tasks (BackgroundTasks): Background tasks to execute.
+        request (Request): The incoming request.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: Response containing the new user and a confirmation message.
+    """
     exist_user = await repository_users.get_user_by_email(body.email, db)
 
     if exist_user:
@@ -29,7 +43,18 @@ async def signup(body: UserModel, background_tasks: BackgroundTasks, request: Re
 
 
 @router.post("/login", response_model=TokenModel)
-async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+async def login(body: OAuth2PasswordRequestForm = Depends(),
+                db: Session = Depends(get_db)) -> dict:
+    """
+    Log in a user and generate access and refresh tokens.
+
+    Args:
+        body (OAuth2PasswordRequestForm): Form containing user credentials.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: Response containing access and refresh tokens.
+    """
     user = await repository_users.get_user_by_email(body.username, db)
 
     if user is None:
@@ -49,7 +74,18 @@ async def login(body: OAuth2PasswordRequestForm = Depends(), db: Session = Depen
 
 
 @router.get('/refresh_token', response_model=TokenModel)
-async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security), db: Session = Depends(get_db)):
+async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security),
+                        db: Session = Depends(get_db)) -> dict:
+    """
+    Refresh the access token using a valid refresh token.
+
+    Args:
+        credentials (HTTPAuthorizationCredentials): Credentials containing the refresh token.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: Response containing a new access token and refresh token.
+    """
     token = credentials.credentials
     email = await auth_service.decode_refresh_token(token)
     user = await repository_users.get_user_by_email(email, db)
@@ -65,7 +101,18 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
 
 @router.get('/confirmed_email/{token}')
-async def confirmed_email(token: str, db: Session = Depends(get_db)):
+async def confirmed_email(token: str,
+                          db: Session = Depends(get_db)) -> dict:
+    """
+    Confirm the email address for a user using a confirmation token.
+
+    Args:
+        token (str): Confirmation token.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: Response message.
+    """
     email = await auth_service.get_email_from_token(token)
     user = await repository_users.get_user_by_email(email, db)
 
@@ -78,8 +125,22 @@ async def confirmed_email(token: str, db: Session = Depends(get_db)):
     return {"message": "Email confirmed."}
 
 @router.post('/request_email')
-async def request_email(body: RequestEmail, background_tasks: BackgroundTasks, request: Request,
-                        db: Session = Depends(get_db)):
+async def request_email(body: RequestEmail,
+                        background_tasks: BackgroundTasks,
+                        request: Request,
+                        db: Session = Depends(get_db)) -> dict:
+    """
+    Request email confirmation for a user.
+
+    Args:
+        body (RequestEmail): Request body containing user email.
+        background_tasks (BackgroundTasks): Background tasks to execute.
+        request (Request): The incoming request.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        dict: Response message.
+    """
     user = await repository_users.get_user_by_email(body.email, db)
 
     if user.confirmed:

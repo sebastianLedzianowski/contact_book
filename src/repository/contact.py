@@ -12,14 +12,48 @@ fake = Faker("pl_PL")
 
 
 async def get_contacts(skip: int, limit: int, user: User, db: Session) -> List[Contact] | None:
+    """
+    Get a list of contacts for a specific user.
+
+    Args:
+        skip (int): Number of records to skip.
+        limit (int): Maximum number of records to retrieve.
+        user (User): The user for whom to retrieve contacts.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        List[Contact] | None: List of contacts or None if no contacts are found.
+    """
     return db.query(Contact).filter(Contact.user_id == user.id).offset(skip).limit(limit).all()
 
 
 async def get_contact(contact_id: int, user: User, db: Session) -> Contact | None:
+    """
+    Get a single contact for a specific user.
+
+    Args:
+        contact_id (int): ID of the contact to retrieve.
+        user (User): The user for whom to retrieve the contact.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        Contact | None: The contact or None if not found.
+    """
     return db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
 
 
 async def create_contact(body: ContactResponse, user: User, db: Session) -> Contact:
+    """
+    Create a new contact for a specific user.
+
+    Args:
+        body (ContactResponse): Data for the new contact.
+        user (User): The user for whom to create the contact.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        Contact: The created contact.
+    """
     contact = Contact(
         id=body.id,
         user_id=user.id,
@@ -36,6 +70,17 @@ async def create_contact(body: ContactResponse, user: User, db: Session) -> Cont
 
 
 async def remove_contact(contact_id: int, user: User, db: Session) -> Contact | None:
+    """
+    Remove a contact for a specific user.
+
+    Args:
+        contact_id (int): ID of the contact to remove.
+        user (User): The user for whom to remove the contact.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        Contact | None: The removed contact or None if not found.
+    """
     contact = db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
     if contact:
         db.delete(contact)
@@ -44,9 +89,19 @@ async def remove_contact(contact_id: int, user: User, db: Session) -> Contact | 
 
 
 async def update_contact(contact_id: int, user: User, body: ContactResponse, db: Session) -> Contact | None:
-    print(f"Updating contact with ID: {contact_id} for user: {user.id}")
+    """
+    Update a contact for a specific user.
+
+    Args:
+        contact_id (int): ID of the contact to update.
+        user (User): The user for whom to update the contact.
+        body (ContactResponse): Data to update the contact.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        Contact | None: The updated contact or None if not found.
+    """
     contact = db.query(Contact).filter(and_(Contact.id == contact_id, Contact.user_id == user.id)).first()
-    print(f"Found contact: {contact}")
     if contact:
         contact.id = body.id
         contact.name = body.name
@@ -59,6 +114,17 @@ async def update_contact(contact_id: int, user: User, body: ContactResponse, db:
 
 
 async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> List[Contact] | None:
+    """
+    Get a list of upcoming birthdays for a specific user.
+
+    Args:
+        days_in_future (int): Number of days into the future to consider.
+        user (User): The user for whom to retrieve upcoming birthdays.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        List[Contact] | None: List of contacts with upcoming birthdays or None if none found.
+    """
     today = date.today()
     upcoming_birthdays_list = []
     contacts = db.query(Contact).filter(Contact.user_id == user.id).all()
@@ -82,6 +148,17 @@ async def upcoming_birthdays(days_in_future: int, user: User, db: Session) -> Li
 
 
 async def searchable_by(choice: str, user: User, db: Session) -> List[Contact] | None:
+    """
+    Search for contacts based on a specified choice (name, lastname, or email).
+
+    Args:
+        choice (str): The choice to search for (name, lastname, or email).
+        user (User): The user for whom to perform the search.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        List[Contact] | None: List of contacts matching the search or None if none found.
+    """
     contacts = db.query(Contact).filter(Contact.user_id == user.id).all()
     list_contacts = []
 
@@ -100,6 +177,17 @@ async def searchable_by(choice: str, user: User, db: Session) -> List[Contact] |
 
 
 async def faker_create_contact(contact_id: int, user: User, db: Session) -> Contact:
+    """
+    Create a fake contact for testing purposes.
+
+    Args:
+        contact_id (int): ID of the fake contact to create.
+        user (User): The user for whom to create the fake contact.
+        db (Session): SQLAlchemy database session.
+
+    Returns:
+        Contact: The created fake contact.
+    """
     contact = Contact(
         id=contact_id,
         user_id=user.id,

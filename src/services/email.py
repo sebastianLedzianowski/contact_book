@@ -24,7 +24,18 @@ conf = ConnectionConfig(
     TEMPLATE_FOLDER=Path(__file__).parent / 'templates',
 )
 
-async def send_email(email: EmailStr, username: str, host: str):
+async def send_email(email: EmailStr, username: str, host: str) -> None:
+    """
+    Send email with a verification token link for email confirmation.
+
+    Args:
+        email (EmailStr): The recipient's email address.
+        username (str): The username of the recipient.
+        host (str): The base URL for the application.
+
+    Raises:
+        ConnectionErrors: If there is an error connecting to the mail server.
+    """
     try:
         token_verification = auth_service.create_email_token({"sub": email})
         message = MessageSchema(

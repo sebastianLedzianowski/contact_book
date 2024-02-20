@@ -34,6 +34,9 @@ rate_limit = RateLimiter(times=10, seconds=60)
 
 @app.on_event("startup")
 async def startup():
+    """
+    Function to initialize FastAPILimiter on application startup.
+    """
     r = await redis.Redis(host=os.getenv("REDIS_HOST"),
                           port=int(os.getenv("REDIS_PORT")),
                           db=int(os.getenv("REDIS_DB")),
@@ -43,6 +46,9 @@ async def startup():
 
 @app.get("/", dependencies=[Depends(rate_limit)])
 async def read_root():
+    """
+    Root endpoint of the application.
+    """
     return {"message": "Hello World"}
 
 
