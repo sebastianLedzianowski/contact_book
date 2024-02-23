@@ -118,11 +118,17 @@ def test_refresh_token(user, session, client):
     assert data["token_type"] == "bearer"
 
 
-def test_confirmed_email_user_is_none(user, session, client):
+def test_confirmed_email_user_is_none(user, session, client, monkeypatch):
     create_user_db(user, session)
-    response = client.get(
-        '/api/auth/confirmed_email/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJpbmNsdWRpbmdAbzIucGwiLCJpYXQiOjE3MDc5MzQwNTQsImV4cCI6MTcwODUzODg1NH0.UCeSStDqYvSXGjiR7WHaLPstjh9yQZHC6s9kAm00NmI'
-    )
+
+    async def mock_get_email_from_token(token):
+        return "example@example.com"
+
+    monkeypatch.setattr(auth_service, "get_email_from_token",
+                        AsyncMock(side_effect=mock_get_email_from_token))
+
+    response = client.get(f'/api/auth/confirmed_email/verification_error')
+
     assert response.status_code == 400, response.text
     data = response.json()
     assert data['detail'] == 'Verification error.'
