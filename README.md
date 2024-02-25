@@ -20,6 +20,7 @@ During the registration process, users are required to confirm their email addre
 - ✏️ **Editing Contacts:** Feature allowing the editing of existing contact details.
 - ❌ **Deleting Contacts:** Ability to remove unnecessary contacts from the list.
 - 📚 **API Documentation:** Explore the detailed API documentation.
+- 🧪 **Testing:** Code tests were carried out using unittest and pytest.
 
 ## Requirements
 
@@ -156,6 +157,41 @@ make html
 **Note:** Make sure to adhere to the rate limits specified for each operation. The avatar can be updated using the provided FastAPI route /users/avatar, which allows users to change their avatar by uploading a new image file. The uploaded image is securely stored using Cloudinary, and the user's avatar URL is updated in the database.
 
 ---
+
+## Testing 🧪
+
+```bash
+Name                                    Stmts   Miss  Cover   Missing
+---------------------------------------------------------------------
+main.py                                    26      4    85%   40-45, 52, 56
+src/__init__.py                             0      0   100%
+src/conf/__init__.py                        0      0   100%
+src/conf/config.py                         28      0   100%
+src/database/__init__.py                    0      0   100%
+src/database/db.py                         13      4    69%   23-27
+src/database/models.py                     27      0   100%
+src/repository/__init__.py                  0      0   100%
+src/repository/contact.py                  51      0   100%
+src/repository/users.py                    24      0   100%
+src/routes/__init__.py                      0      0   100%
+src/routes/auth.py                         63      0   100%
+src/routes/contacts.py                     48      0   100%
+src/routes/users.py                        23      0   100%
+src/schemas.py                             32      0   100%
+src/services/__init__.py                    0      0   100%
+src/services/auth.py                       84     17    80%   75, 95, 120-122, 149-153, 158, 196-202
+src/services/email.py                      17      2    88%   50-51
+tests/__init__.py                           0      0   100%
+tests/conftest.py                          65      0   100%
+tests/test_main.py                          0      0   100%
+tests/test_routes_auth.py                 103      0   100%
+tests/test_routes_contacts.py             161      0   100%
+tests/test_routes_users.py                 26      0   100%
+tests/test_unit_repository_contact.py      76      0   100%
+tests/test_unit_repository_users.py        45      0   100%
+---------------------------------------------------------------------
+TOTAL                                     912     27    97%
+```
 
 ### Additional Information
 
