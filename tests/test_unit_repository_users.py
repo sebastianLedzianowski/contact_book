@@ -74,7 +74,3 @@ class TestUsers(unittest.IsolatedAsyncioTestCase):
         await update_avatar(email=body.email, url="new_avatar", db=self.session)
 
         self.assertEqual(body.avatar, "new_avatar")
-
-
-if __name__ == "__main__":
-    unittest.main()

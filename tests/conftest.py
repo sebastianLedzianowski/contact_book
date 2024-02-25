@@ -4,9 +4,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from main import app
-from src.database.models import Base, User
+from src.database.models import Base, User, Contact
 from src.database.db import get_db
 from src.services.auth import auth_service
+from faker import Faker
+
+fake = Faker("pl_PL")
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
 
@@ -41,18 +44,21 @@ def client(session):
 @pytest.fixture(scope="function")
 def user():
     class UserTest:
-        def __init__(self, username, email, password):
+        def __init__(self, id, username, email, password):
+            self.id = id
             self.username = username
             self.email = email
             self.password = password
 
         def dict(self):
             return {
+                "id": self.id,
                 "username": self.username,
                 "email": self.email,
                 "password": self.password
             }
-    return UserTest(username="deadpool",
+    return UserTest(id=1,
+                    username="deadpool",
                     email="deadpool@example.com",
                     password="123456789")
 
@@ -83,3 +89,29 @@ def login_user_token_created(user, session):
     session.commit()
 
     return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
+
+
+def faker_create_contact(id: int, user: User, db: session) -> dict:
+    contact = Contact(
+        id=id,
+        user_id=user.id,
+        name=fake.first_name(),
+        lastname=fake.last_name(),
+        phone_number=fake.phone_number(),
+        email=fake.email(),
+        birthday=fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
+    )
+
+    db.add(contact)
+    db.commit()
+    db.refresh(contact)
+
+    return {
+        "id": id,
+        "user_id": contact.user_id,
+        "name": contact.name,
+        "lastname": contact.lastname,
+        "phone_number": contact.phone_number,
+        "email": contact.email,
+        "birthday": contact.birthday
+    }

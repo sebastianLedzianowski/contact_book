@@ -6,10 +6,6 @@ from sqlalchemy import and_
 from src.database.models import Contact, User
 from src.schemas import ContactResponse
 
-from faker import Faker
-
-fake = Faker("pl_PL")
-
 
 async def get_contacts(skip: int, limit: int, user: User, db: Session) -> List[Contact] | None:
     """
@@ -174,30 +170,3 @@ async def searchable_by(choice: str, user: User, db: Session) -> List[Contact] |
                 birthday=contact.birthday
             ))
     return list_contacts
-
-
-async def faker_create_contact(contact_id: int, user: User, db: Session) -> Contact:
-    """
-    Create a fake contact for testing purposes.
-
-    Args:
-        contact_id (int): ID of the fake contact to create.
-        user (User): The user for whom to create the fake contact.
-        db (Session): SQLAlchemy database session.
-
-    Returns:
-        Contact: The created fake contact.
-    """
-    contact = Contact(
-        id=contact_id,
-        user_id=user.id,
-        name=fake.first_name(),
-        lastname=fake.last_name(),
-        phone_number=fake.phone_number(),
-        email=fake.email(),
-        birthday=fake.date_of_birth(minimum_age=18, maximum_age=50).strftime('%Y-%m-%d')
-    )
-    db.add(contact)
-    db.commit()
-    db.refresh(contact)
-    return contact

@@ -44,7 +44,7 @@ async def startup():
                           decode_responses=True)
     await FastAPILimiter.init(r)
 
-@app.get("/", dependencies=[Depends(rate_limit)])
+@app.get("/")
 async def read_root():
     """
     Root endpoint of the application.

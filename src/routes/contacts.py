@@ -15,8 +15,7 @@ router = APIRouter(prefix='/contacts', tags=["contacts"])
 rate_limit = RateLimiter(times=10, seconds=60)
 
 
-@router.get("/", response_model=List[ContactResponse], description='No more than 10 requests per minute',
-            dependencies=[Depends(rate_limit)])
+@router.get("/", response_model=List[ContactResponse])
 async def read_contacts(skip: int = 0, limit: int = 20, db: Session = Depends(get_db),
                         current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -43,8 +42,7 @@ async def read_contacts(skip: int = 0, limit: int = 20, db: Session = Depends(ge
     return contact
 
 
-@router.get("/{contact_id}", response_model=ContactResponse, description='No more than 10 requests per minute',
-            dependencies=[Depends(rate_limit)])
+@router.get("/{contact_id}", response_model=ContactResponse)
 async def read_contact(contact_id: int, db: Session = Depends(get_db),
                        current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -64,8 +62,7 @@ async def read_contact(contact_id: int, db: Session = Depends(get_db),
     return contact
 
 
-@router.post("/", response_model=ContactResponse, status_code=status.HTTP_201_CREATED,
-             description='No more than 10 requests per minute', dependencies=[Depends(rate_limit)])
+@router.post("/", response_model=ContactResponse, status_code=status.HTTP_201_CREATED)
 async def create_contact(body: ContactResponse, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -82,8 +79,7 @@ async def create_contact(body: ContactResponse, db: Session = Depends(get_db),
     return await repository_contact.create_contact(body, current_user, db)
 
 
-@router.put("/{contact_id}", response_model=ContactResponse, description='No more than 10 requests per minute',
-            dependencies=[Depends(rate_limit)])
+@router.put("/{contact_id}", response_model=ContactResponse)
 async def update_contact(contact_id: int, body: ContactResponse, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -104,8 +100,7 @@ async def update_contact(contact_id: int, body: ContactResponse, db: Session = D
     return contact
 
 
-@router.delete("/{contact_id}", response_model=ContactResponse, description='No more than 10 requests per minute',
-               dependencies=[Depends(rate_limit)])
+@router.delete("/{contact_id}", response_model=ContactResponse)
 async def remove_contact(contact_id: int, db: Session = Depends(get_db),
                          current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -126,8 +121,7 @@ async def remove_contact(contact_id: int, db: Session = Depends(get_db),
 
 
 
-@router.get("/upcoming_birthdays/{days_in_future}", response_model=List[ContactResponse],
-            description='No more than 10 requests per minute', dependencies=[Depends(rate_limit)])
+@router.get("/upcoming_birthdays/{days_in_future}", response_model=List[ContactResponse])
 async def upcoming_birthdays(days_in_future: int, db: Session = Depends(get_db),
                              current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -142,13 +136,10 @@ async def upcoming_birthdays(days_in_future: int, db: Session = Depends(get_db),
         List[ContactResponse]: List of contacts with upcoming birthdays.
     """
     contact = await repository_contact.upcoming_birthdays(days_in_future, current_user, db)
-    if contact is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
     return contact
 
 
-@router.get("/searchable_by/{choice}", response_model=List[ContactResponse],
-            description='No more than 10 requests per minute', dependencies=[Depends(rate_limit)])
+@router.get("/searchable_by/{choice}", response_model=List[ContactResponse])
 async def searchable_by(choice: str, db: Session = Depends(get_db),
                         current_user: User = Depends(auth_service.get_current_user)) -> Any:
     """
@@ -163,6 +154,4 @@ async def searchable_by(choice: str, db: Session = Depends(get_db),
         List[ContactResponse]: List of contacts matching the search term.
     """
     contact = await repository_contact.searchable_by(choice, current_user, db)
-    if contact is None:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contact not found.")
     return contact

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, status, Security, BackgroundTasks, Request, HTTPException
+from fastapi import APIRouter, Depends, status, Security, BackgroundTasks, Request
 from fastapi.security import OAuth2PasswordRequestForm, HTTPAuthorizationCredentials, HTTPBearer
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
@@ -16,7 +16,7 @@ security = HTTPBearer()
 @router.post("/signup", response_model=UserResponse, status_code=status.HTTP_201_CREATED)
 async def signup(body: UserModel,
                  background_tasks: BackgroundTasks,
-                 request: Request, db: Session = Depends(get_db)) -> dict:
+                 request: Request, db: Session = Depends(get_db)) -> JSONResponse | dict:
     """
     Sign up a new user.
 
@@ -44,7 +44,7 @@ async def signup(body: UserModel,
 
 @router.post("/login", response_model=TokenModel)
 async def login(body: OAuth2PasswordRequestForm = Depends(),
-                db: Session = Depends(get_db)) -> dict:
+                db: Session = Depends(get_db)) -> JSONResponse | dict:
     """
     Log in a user and generate access and refresh tokens.
 
@@ -75,7 +75,7 @@ async def login(body: OAuth2PasswordRequestForm = Depends(),
 
 @router.get('/refresh_token', response_model=TokenModel)
 async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(security),
-                        db: Session = Depends(get_db)) -> dict:
+                        db: Session = Depends(get_db)) -> JSONResponse | dict:
     """
     Refresh the access token using a valid refresh token.
 
@@ -100,9 +100,9 @@ async def refresh_token(credentials: HTTPAuthorizationCredentials = Security(sec
     await repository_users.update_token(user, refresh_token_, db)
     return {"access_token": access_token, "refresh_token": refresh_token_, "token_type": "bearer"}
 
-@router.get('/confirmed_email/{token}')
+@router.get('/confirmed_email/{token}', response_model=None)
 async def confirmed_email(token: str,
-                          db: Session = Depends(get_db)) -> dict:
+                          db: Session = Depends(get_db)) -> JSONResponse | dict:
     """
     Confirm the email address for a user using a confirmation token.
 
