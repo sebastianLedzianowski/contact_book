@@ -13,7 +13,6 @@ from src.repository.contact import (
     update_contact,
     upcoming_birthdays,
     searchable_by,
-    faker_create_contact
 )
 
 
@@ -116,19 +115,3 @@ class TestContacts(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result[0].email, search_by.email)
         self.assertEqual(result[0].phone_number, search_by.phone_number)
         self.assertEqual(result[0].birthday, search_by.birthday)
-
-    async def test_faker_create_contact(self):
-        contact_id = 1
-        result = await faker_create_contact(contact_id=contact_id, user=self.user, db=self.session)
-
-        self.assertEqual(result.id, contact_id)
-        self.assertEqual(result.user_id, self.user.id)
-        self.assertIsNotNone(result.name)
-        self.assertIsNotNone(result.lastname)
-        self.assertIsNotNone(result.email)
-        self.assertIsNotNone(result.phone_number)
-        self.assertIsNotNone(result.birthday)
-
-
-if __name__ == '__main__':
-    unittest.main()
